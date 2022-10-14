@@ -1,9 +1,6 @@
 import models.EstudianteModel;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -15,7 +12,7 @@ public class Main {
         //El padre le pasa el nombre del fichero a leer o a escribir, todo con -jars
         Scanner sc = new Scanner(System.in);
         ArrayList<EstudianteModel> listaEstudiante = new ArrayList<>();
-        File destino = new File("AlumnosFichero");
+        File destino = new File("AlumnosFichero.txt");
         ProcessBuilder proceso = null;
         int opcion;
         do {
@@ -25,15 +22,17 @@ public class Main {
                 switch (opcion) {
                     case 1:
                         anyadirAlumno(sc, listaEstudiante);
-                    /*for (EstudianteModel e: listaEstudiante) {
+                    for (EstudianteModel e: listaEstudiante) {
                         System.out.println(e);
-                    }*/
+                    }
                         break;
                     case 2:
                         proceso = new ProcessBuilder("java", "-jar", "addAlumno.jar");
-                        guardarDatosAlumno(destino, listaEstudiante, proceso);
+                        guardarDatosAlumno( destino, listaEstudiante, proceso);
                         break;
                     case 3:
+                        proceso = new ProcessBuilder("java", "-jar", "cargarAlumno.jar");
+                        cargarDatosAlumno(destino ,proceso, listaEstudiante);
                         break;
                     case 4:
                         break;
@@ -46,7 +45,9 @@ public class Main {
 
     }
 
-    private static void guardarDatosAlumno(File destino, ArrayList<EstudianteModel> listaEstudiante, ProcessBuilder proceso) throws IOException {
+    private static void cargarDatosAlumno(File destino, ProcessBuilder proceso, ArrayList<EstudianteModel> listaEstudiante) throws IOException {
+        listaEstudiante.clear();
+
         proceso.redirectErrorStream(true);
         Process hijo = proceso.start();
 
@@ -55,8 +56,47 @@ public class Main {
 
         ps.println(destino);
         ps.flush();
-        ps.println(listaEstudiante);
-        ps.flush();
+
+        //AHORA A LEER
+        InputStream is = hijo.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+
+        BufferedReader br = new BufferedReader(isr);
+        while(br.readLine()!= null){
+            String nombre = br.readLine();
+            String apellido = br.readLine();
+            String dni = br.readLine();
+            EstudianteModel estudiante = new EstudianteModel(nombre, apellido, dni);
+            listaEstudiante.add(estudiante);
+        }
+
+        for (EstudianteModel e: listaEstudiante) {
+            System.out.println(e);
+        }
+
+    }
+
+    private static void guardarDatosAlumno(File destino, ArrayList<EstudianteModel> listaEstudiante, ProcessBuilder proceso) throws IOException {
+
+
+
+        for (int i = 0; i < listaEstudiante.size(); i++) {
+
+            proceso.redirectErrorStream(true);
+            Process hijo = proceso.start();
+
+            OutputStream ops = hijo.getOutputStream();
+            PrintStream ps = new PrintStream(ops);
+
+            ps.println(destino);
+            ps.flush();
+            ps.println(listaEstudiante.get(i).toString());
+            ps.flush();
+
+        }
+
+
+
 
 
     }

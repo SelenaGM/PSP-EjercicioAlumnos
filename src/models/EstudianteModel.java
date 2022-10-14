@@ -39,10 +39,6 @@ public class EstudianteModel {
 
     @Override
     public String toString() {
-        return "EstudianteModel{" +
-                "nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", dni='" + dni + '\'' +
-                '}';
+        return nombre+";"+apellido+";"+dni;
     }
 }
