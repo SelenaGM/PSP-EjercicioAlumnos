@@ -1,6 +1,7 @@
 import models.EstudianteModel;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -27,14 +28,23 @@ public class Main {
                     }
                         break;
                     case 2:
+                        //System.out.println("Dime el nombre del fichero");
+                        //try{
+                        //guardarDatosAlumno(listaEstudiante,sc.nextLine());
+                        //}catch(){}
                         proceso = new ProcessBuilder("java", "-jar", "addAlumno.jar");
                         guardarDatosAlumno( destino, listaEstudiante, proceso);
                         break;
                     case 3:
                         proceso = new ProcessBuilder("java", "-jar", "cargarAlumno.jar");
+                        //System.out.println("Dime el nombre del fichero");
+                        //try{
+                        //cargarDatosAlumno(listaEstudiante,sc.nextLine());
+                        //}catch(){}
                         cargarDatosAlumno(destino ,proceso, listaEstudiante);
                         break;
                     case 4:
+                        muestraAlumnos(listaEstudiante);
                         break;
                     default:
                 }
@@ -45,8 +55,16 @@ public class Main {
 
     }
 
+    private static void muestraAlumnos(ArrayList<EstudianteModel> listaEstudiante) {
+
+        for(EstudianteModel a: listaEstudiante){
+           System.out.println(a.toString());
+        }
+
+    }
+
     private static void cargarDatosAlumno(File destino, ProcessBuilder proceso, ArrayList<EstudianteModel> listaEstudiante) throws IOException {
-        listaEstudiante.clear();
+        /*listaEstudiante.clear();
 
         proceso.redirectErrorStream(true);
         Process hijo = proceso.start();
@@ -72,7 +90,39 @@ public class Main {
 
         for (EstudianteModel e: listaEstudiante) {
             System.out.println(e);
+        }*/
+
+        //SOLUCION EDU
+
+        String fileName = null;
+        listaEstudiante.clear();
+        ProcessBuilder processBuilder = new ProcessBuilder("java","-jar","librerias/cargarAlumno");
+        processBuilder.redirectErrorStream(true);
+        Process process = processBuilder.start();
+
+        OutputStream os = process.getOutputStream(); //ESTO ES PARA ESCRIBIR
+        PrintStream ps = new PrintStream(os);
+
+        InputStream is = process.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8); //el utf es para temas de codificacion
+        BufferedReader br = new BufferedReader(isr);
+
+        ps.println(destino);
+        ps.flush();
+
+
+        if((new File(fileName)).exists()){
+            listaEstudiante.clear();
+
         }
+
+        String linea;
+
+        while(!((linea = br.readLine()).isEmpty())){
+            listaEstudiante.add(new EstudianteModel(linea));
+        }
+
+
 
     }
 
@@ -90,11 +140,10 @@ public class Main {
 
             ps.println(destino);
             ps.flush();
-            ps.println(listaEstudiante.get(i).toString());
+            ps.println(listaEstudiante.get(i).toFile());
             ps.flush();
 
         }
-
 
 
 

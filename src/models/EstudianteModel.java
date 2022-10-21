@@ -36,9 +36,23 @@ public class EstudianteModel {
     }
 
 
-
     @Override
     public String toString() {
+        return "EstudianteModel{" +
+                "nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", dni='" + dni + '\'' +
+                '}';
+    }
+
+    public String toFile() {
         return nombre+";"+apellido+";"+dni;
+    }
+
+    public EstudianteModel(String alumnoCodificao) {
+        //SOLUCION DE EDU
+        this.nombre = alumnoCodificao.split(";")[0];
+        this.apellido= alumnoCodificao.split(";")[1];
+        this.dni = alumnoCodificao.split(";")[2];
     }
 }
